@@ -1,0 +1,30 @@
+seremit
+=======
+
+https://github.com/miebach/seremit
+
+Description: The  "SEcure REmote MIrroring Tool". 
+Basically a python wrapper around rsync. Could be useful to mirror backups
+
+Install this module:
+
+  sudo pip install seremit-0.0.x.tar.gz 
+
+(replace x with the latest stable version)
+
+Usage example
+
+  #!/usr/bin/python
+  from seremit import seremit
+  
+  s = seremit.Seremit(syslog_tag="SEREMIT-EXAMPLE-SRC1") # seremit will log to local syslog with this tag
+  s.source(local=False,user="seremit",host="remote.example.com",path="\mnt\backup\src1\")
+  s.target(local=True,path="\mnt\archive\example-com\")
+  s.set_rules(
+    source_after_sync_action="keep", # do not remove files in the source tree after copy
+    source_removed_action="keep-target", # do not remove files from target, if removed from source
+    source_changed_action="overwrite-target" # if a source file changes, overwrite the target file with the new version
+  )
+  s.sync()
+  print s.results()
+    

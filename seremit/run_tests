@@ -1,0 +1,4 @@
+#!/bin/sh
+chmod ug+x test_seremit.py
+./test_seremit.py
+

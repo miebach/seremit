@@ -1,0 +1,4 @@
+*.pyc
+*/**/*.pyc
+MANIFEST
+seremit.egg-info
