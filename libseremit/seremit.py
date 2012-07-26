@@ -17,11 +17,11 @@ def shellcall(cmd,silent=False):
     return result
 
 class Endpoint(object):
-  """An Endpoint (sorce or target) for a sync operation"""
+  """An Endpoint (source or target) for a sync operation"""
   pass
   
 class Rules(object):
-  """Rules for  sync operation"""
+  """Rules for sync operation"""
   pass
 
 class Logger(object):
@@ -54,8 +54,9 @@ class Seremit(object):
   
   Rsync usage:
   
-  A trailing slash is not neccesary, but on the source it avoids directory duplication, so     
-  both forms result in the same transfer:
+  A trailing slash is not neccesary, but if you add one to the source path, 
+  it avoids directory duplication in the target.
+  So both forms result in the same transfer:
   
     rsync -av /src/foo /dest
     rsync -av /src/foo/ /dest/foo

@@ -15,7 +15,7 @@ Install this module:
 Usage example
 
   #!/usr/bin/python
-  from seremit import seremit
+  from libseremit import seremit
   
   s = seremit.Seremit(syslog_tag="SEREMIT-EXAMPLE-SRC1") # seremit will log to local syslog with this tag
   s.source(local=False,user="seremit",host="remote.example.com",path="\mnt\backup\src1\")
