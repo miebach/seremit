@@ -11,7 +11,10 @@ opj = os.path.join
 # z = compress
 # stats = output little summary at the end
 
-from std import STD_PARAMS
+STD_PARAMS = "-avz --stats" + \
+  " --timeout=320" + \
+  " --numeric-ids" + \
+  " --partial" 
 
 class TestSeremit(unittest.TestCase):
       
@@ -34,10 +37,11 @@ class TestSeremit(unittest.TestCase):
     s=self.s
     s.set_source(local=False,host="remote.example.com",path="/mnt/backup/src1/")
     s.set_target(local=True,path="/mnt/archive/example-com/")
+    s.option_progress()
     self.s.do_sync()
     self.assertEqual(s.get_result().log,[
       ("init","fake_run=True"),
-      ("shell","fake_run=True","rsync %s remote.example.com:/mnt/backup/src1/ /mnt/archive/example-com/" % STD_PARAMS),
+      ("shell","fake_run=True","rsync %s %s remote.example.com:/mnt/backup/src1/ /mnt/archive/example-com/" % (STD_PARAMS,"--progress")),
     ])
    
   def testRsync3(self):
@@ -67,13 +71,6 @@ class TestSeremit(unittest.TestCase):
     s=self.s
     s.set_source(local=False,user="seremit",host="remote.example.com",path="/mnt/backup/src1/")
     s.set_target(local=True,path="/mnt/archive/example-com/")
-    s.set_rules(
-      # do not remove files in the source tree after copy:
-      source_after_sync_action="keep", 
-      # do not remove files from target, if removed from source:
-      source_removed_action="keep-target", 
-      # if a source file changes, overwrite the target file with the new version:
-      source_changed_action="overwrite-target") 
     self.s.do_sync()
     print self.s.get_result()
       

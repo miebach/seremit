@@ -1,3 +1,6 @@
+#!/usr/bin/python
+
+
 def shellcall(cmd,silent=False):
   # do a system call with shell = true
   # taken from
@@ -20,9 +23,6 @@ class Endpoint(object):
   """An Endpoint (source or target) for a sync operation"""
   pass
   
-class Rules(object):
-  """Rules for sync operation"""
-  pass
 
 class Logger(object):
   """logs to syslog using the unix logger function"""
@@ -96,16 +96,32 @@ class Seremit(object):
   
   def __init__(self,syslog_tag=None,fake_run=False):
     self.result = Result()
+    self.result_s=""
+    self.moreoptions=[]
     self.fake_run=fake_run
     self.logger=Logger(syslog_tag)
     self.log(("init", "fake_run=%s" % (self.fake_run)))
+
+  def option_backup(self):
+    self.moreoptions.append("--backup")
+
+  def option_progress(self):
+    self.moreoptions.append("--progress")
+
     
   def construct_command(self):
-    from std import STD_PARAMS 
     s = self.construct_endpoint(self.source)
     t = self.construct_endpoint(self.target)
-    c = "rsync %s %s %s" % (
-        STD_PARAMS,s,t)
+    more = " ".join(self.moreoptions)
+    if more != "":
+      more =  " "  + more 
+    c = "rsync %s%s %s %s" % ( "-avz --stats" + \
+        " --timeout=320" + \
+        " --numeric-ids" + \
+        " --partial", 
+        #" --skip-compress=rar/gz/zip/z/rpm/deb/iso/bz2/tgz/tbz/7z/" + \
+        #                 "mp3/mp4/mov/avi/ogg/jpg/jpeg/gif/png/msi"
+        more,s,t)
     self.command = c
     
   def log(self,tup):
@@ -134,29 +150,21 @@ class Seremit(object):
     p.path = path
     self.target = p
   
-  def set_rules(self,
-    # do not remove files in the source tree after copy:
-    source_after_sync_action="keep", 
-    # do not remove files from target, if removed from source:
-    source_removed_action="keep-target", 
-    # if a source file changes, overwrite the target file with the new version:
-    source_changed_action="overwrite-target"): 
-    r = Rules()
-    r.source_after_sync_action=source_after_sync_action
-    r.source_removed_action=source_removed_action
-    r.source_changed_action=source_changed_action
-    self.rules = r
-  
   def do_sync(self):
     self.construct_command()
     self.run_command()
 
   def run_command(self):
     if self.fake_run:
-      self.log(("shell","fake_run=True",self.command))
+      result_t=("shell","fake_run=True",self.command)
+      self.log(result_t)
+      self.result_s = "%s %s %s" % result_t
     else:
       result = shellresult=shellcall(self.command)
-      self.log(("shell","fake_run=False","result=%s" % result,self.command))
+      result_t=("shell","fake_run=False","result=%s" % result,self.command)
+      self.log(result_t)
+      self.result_s = "%s %s %s %s" % result_t
+      
       
   def construct_endpoint(self,endpoint):
     e=endpoint
